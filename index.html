@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>跑团风格诊断</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-color: #fcfcfc;
+      --card-bg: #f2f0eb; /* 米色背景 */
+      --card-border: 3px solid #4a4a4a; /* 深色粗边框 */
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --accent-pink: #d4a5a5; /* 忙碌/标签颜色 */
+      --accent-yellow: #e3cf8e; /* 空闲/标签颜色 */
+      --accent-grey: #dcdcdc;
+      --radius-lg: 24px;
+      --radius-md: 12px;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: linear-gradient(135deg, #e8ddd0 0%, #d4c4b0 100%);
+      min-height: 100vh;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ========================================= 
+       开始页面样式
+       ========================================= */
+    .start-page {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .intro-text {
+      font-size: 18px;
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+
+    .start-button {
+      background: linear-gradient(135deg, #c9b8a3 0%, #a69181 100%);
+      color: white;
+      border: none;
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: all 0.3s;
+    }
+
+    .start-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(169, 145, 129, 0.3);
+    }
+
+    /* ========================================= 
+       问题页面样式
+       ========================================= */
+    .question-page {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .question-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .question-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .progress {
+      background: rgba(169, 145, 129, 0.15);
+      padding: 8px 20px;
+      border-radius: 20px;
+      display: inline-block;
+      font-weight: 600;
+      color: #a69181;
+    }
+
+    .question-text {
+      font-size: 22px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 40px;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .option-button {
+      background: white;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      gap: 12px;
+    }
+
+    .option-button:hover {
+      border-color: #a69181;
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(169, 145, 129, 0.2);
+    }
+
+    .option-label {
+      background: #a69181;
+      color: white;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: 600;
+      font-size: 14px;
+      min-width: 24px;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    .option-text {
+      flex: 1;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    /* ========================================= 
+       结果页面样式 - 新设计
+       ========================================= */
+    .result-page {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 通用卡片样式 */
+    .card {
+      background-color: var(--card-bg);
+      border: var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: relative;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.1); 
+    }
+
+    /* 顶部：名片区域 */
+    .top-section {
+      display: flex;
+      gap: 30px;
+      align-items: stretch;
+      min-height: 280px;
+    }
+
+    /* 左侧头像 */
+    .avatar-area {
+      flex: 0 0 220px;
+      border: 2px solid #333;
+      border-radius: var(--radius-md);
+      background-color: #fff;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s;
+    }
+
+    .avatar-area:hover .upload-hint {
+      opacity: 1;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .upload-hint {
+      position: absolute;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    /* 右侧信息 */
+    .info-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .player-id {
+      font-size: 64px;
+      font-weight: 900;
+      color: #333;
+      line-height: 1.2;
+      border-bottom: 2px dashed transparent;
+      margin-bottom: 5px;
+      min-width: 150px;
+    }
+
+    .player-id:hover, .player-id:focus {
+      border-bottom-color: #999;
+      outline: none;
+    }
+
+    .player-title {
+      font-size: 20px;
+      letter-spacing: 4px;
+      color: var(--accent-pink);
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .tags-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .tag-pill {
+      padding: 8px 24px;
+      border-radius: 20px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .tag-primary { background-color: var(--accent-pink); }
+    .tag-secondary { background-color: var(--accent-yellow); color: #5a4a2d; }
+
+    .quote-box {
+      font-size: 14px;
+      color: var(--text-secondary);
+      max-width: 80%;
+      font-style: italic;
+      line-height: 1.6;
+      padding: 10px;
+      border: 1px dashed rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    
+    .quote-box:focus {
+      outline: none;
+      background: rgba(255,255,255,0.5);
+    }
+
+    /* 底部：两列布局 */
+    .bottom-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    /* 左下：跑团履历 */
+    .resume-content {
+      display: flex;
+      gap: 10px;
+    }
+
+    .resume-list {
+      flex: 1;
+      background: #e0e0e0;
+      border-radius: var(--radius-md);
+      padding: 15px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .resume-item {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      padding: 5px;
+      font-size: 14px;
+      color: #555;
+      width: 100%;
+      text-align: center;
+      font-family: inherit;
+    }
+    .resume-item:focus {
+      outline: none;
+      background: rgba(255,255,255,0.5);
+    }
+    .resume-item::placeholder {
+      color: #999;
+    }
+
+    /* 侧边气泡 */
+    .side-bubbles {
+      width: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bubble {
+      padding: 15px 10px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bubble-grey {
+      background-color: #e6e6e6;
+      color: #666;
+      flex: 1;
+    }
+
+    .bubble-pink {
+      background-color: var(--accent-pink);
+      color: white;
+      flex: 1;
+    }
+
+    .editable-area:focus {
+      outline: none;
+      background-color: rgba(255,255,255,0.2);
+    }
+
+    /* 右下：日程安排 */
+    .calendar-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: transform 0.1s, background-color 0.2s;
+      border: 1px solid transparent;
+    }
+    
+    .legend-item:hover {
+      background-color: rgba(0,0,0,0.05);
+    }
+
+    .legend-item.active {
+      background-color: #fff;
+      border-color: #999;
+      transform: scale(1.05);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .dot.free { background-color: var(--accent-yellow); }
+    .dot.busy { background-color: var(--accent-pink); }
+
+    .calendar-grids-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .month-block {
+      /* 每个月的块 */
+    }
+
+    .month-title {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .cal-cell {
+      aspect-ratio: 1;
+      background-color: #e0e0e0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      user-select: none;
+    }
+
+    .cal-cell:hover {
+      opacity: 0.8;
+    }
+    
+    .cal-cell.empty {
+      background-color: transparent;
+      cursor: default;
+    }
+
+    .cal-cell.status-free {
+      background-color: var(--accent-yellow);
+      color: #5a4a2d;
+      font-weight: bold;
+    }
+
+    .cal-cell.status-busy {
+      background-color: var(--accent-pink);
+      color: white;
+      font-weight: bold;
+    }
+
+    /* 重新开始按钮 */
+    .restart-button {
+      background: linear-gradient(135deg, #c9b8a3 0%, #a69181 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s;
+      position: absolute;
+      top: 24px;
+      right: 24px;
+    }
+
+    .restart-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(169, 145, 129, 0.3);
+    }
+
+    /* ========================================= 
+       移动端适配
+       ========================================= */
+    @media (max-width: 768px) {
+      .top-section {
+        flex-direction: column;
+        align-items: center;
+        height: auto;
+      }
+      .avatar-area {
+        width: 160px;
+        height: 160px;
+        flex: none;
+      }
+      .info-area {
+        width: 100%;
+      }
+      .bottom-section {
+        grid-template-columns: 1fr;
+      }
+      .resume-content {
+        flex-direction: row;
+      }
+      .restart-button {
+        position: static;
+        margin: 20px auto 0;
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- 开始页面 -->
+    <div id="start-page" class="start-page">
+      <h1 class="title">跑团风格诊断</h1>
+      <p class="intro-text">通过 8 个经典跑团情境问题</p>
+      <p class="intro-text">探索你独特的跑团风格</p>
+      <p class="intro-text">发现属于你的角色类型</p>
+      <button id="start-btn" class="start-button">开始测试</button>
+    </div>
+
+    <!-- 问题页面 -->
+    <div id="question-page" class="question-page hidden">
+      <div class="question-container">
+        <div class="question-header">
+          <div id="question-number" class="progress">Q1</div>
+        </div>
+        <div id="question-text" class="question-text"></div>
+        <div id="options-container" class="options"></div>
+      </div>
+    </div>
+
+    <!-- 结果页面 -->
+    <div id="result-page" class="result-page hidden">
+      <button id="restart-btn" class="restart-button">重新测试</button>
+      
+      <!-- 顶部名片卡片 -->
+      <div class="card top-section">
+        <!-- 左侧：头像上传 -->
+        <div class="avatar-area" onclick="document.getElementById('file-input').click()">
+          <img id="avatar-preview" class="avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ddd'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23888' text-anchor='middle' dy='.3em'%3E点击上传头像%3C/text%3E%3C/svg%3E" alt="Avatar">
+          <div class="upload-hint">点击更换</div>
+          <input type="file" id="file-input" accept="image/*">
+        </div>
+
+        <!-- 右侧：信息 -->
+        <div class="info-area">
+          <div id="player-name" class="player-id" contenteditable="true" spellcheck="false">玩家名</div>
+          <div id="result-title" class="player-title">角色称号</div>
+          <div class="tags-row">
+            <div id="main-tag" class="tag-pill tag-primary">主要类型</div>
+            <div id="sub-tag" class="tag-pill tag-secondary">次要类型</div>
+          </div>
+          <div id="result-description" class="quote-box" contenteditable="true" spellcheck="false">
+            "角色描述将在这里显示"
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部区域 -->
+      <div class="bottom-section">
+        
+        <!-- 左下：跑团履历 -->
+        <div class="card">
+          <h3 class="section-title">跑团履历</h3>
+          <div class="resume-content">
+            <div class="resume-list">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+              <input type="text" class="resume-item" placeholder="点击输入模组名称...">
+            </div>
+            
+            <div class="side-bubbles">
+              <div class="bubble bubble-grey editable-area" contenteditable="true">
+                喜欢跑团类型<br>PL/KP皆可<br>描述你的偏好
+              </div>
+              <div class="bubble bubble-pink editable-area" contenteditable="true">
+                雷点：<br>在这里写下<br>你的雷点
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右下：日程安排 -->
+        <div class="card">
+          <div class="calendar-header-row">
+            <h3 class="section-title" style="margin-bottom: 0;">日程安排</h3>
+            <div class="legend">
+              <div class="legend-item" id="tool-free" onclick="selectTool('free')">
+                <span class="dot free"></span> 空闲
+              </div>
+              <div class="legend-item" id="tool-busy" onclick="selectTool('busy')">
+                <span class="dot busy"></span> 忙碌
+              </div>
+            </div>
+          </div>
+
+          <div class="calendar-grids-container" id="calendar-container">
+            <!-- 日历将由 JS 动态生成 -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 角色类型定义
+    var characterTypes = {
+      architect: {
+        name: "机制构筑师",
+        title: "人型自走Excel",
+        description: "我不是在钻研规则，我是在为胜利构建最完美的逻辑体系。",
+        color: "blue"
+      },
+      commander: {
+        name: "战术指挥官",
+        title: "团队节拍器",
+        description: "我不是在控制欲作祟，我是在为大家的胜利负责。",
+        color: "red"
+      },
+      actor: {
+        name: "沉浸扮演者",
+        title: "剧情诠释师",
+        description: "我不是在强推NPC，我是在为我们的HE制造一点无伤大雅的戏剧性波折。",
+        color: "pink"
+      },
+      explorer: {
+        name: "世界勘探家",
+        title: "剧情考古学家",
+        description: "我不是好奇心过剩，我是在为这个世界的深度负责。",
+        color: "green"
+      },
+      optimizer: {
+        name: "优化者",
+        title: "效率工程师",
+        description: "我不是在追求完美，我是在为资源的最佳配置服务。",
+        color: "purple"
+      },
+      creator: {
+        name: "创造者",
+        title: "灵感发动机",
+        description: "我不是在天马行空，我是在为故事的无限可能性开疆拓土。",
+        color: "orange"
+      },
+      collaborator: {
+        name: "协作者",
+        title: "团队粘合剂",
+        description: "我不是在和稀泥，我是在为每个人的闪光点提供展示舞台。",
+        color: "yellow"
+      },
+      soloist: {
+        name: "独行侠",
+        title: "孤勇者",
+        description: "我不是在特立独行，我是在为自己的信念承担全部责任。",
+        color: "gray"
+      }
+    };
+
+    // 标签颜色映射
+    var tagColorMap = {
+      blue: 'primary',
+      red: 'primary', 
+      pink: 'primary',
+      green: 'primary',
+      purple: 'primary',
+      orange: 'primary',
+      yellow: 'secondary',
+      gray: 'primary'
+    };
+
+    // 问题数据（带计分）
+    var questions = [
+      {
+        text: "HO上写着：你天生比别人多了50点属性。你的第一反应是：",
+        options: [
+          { text: "爽。玩的就是数值超模。平衡？那是什么，能吃吗？", scores: { architect: 2, optimizer: 1 } },
+          { text: "KP，咱认真的，把这个删了吧。我不想玩'简单模式'。", scores: { commander: 1, collaborator: 2 } },
+          { text: "懂了，启动'保猫模式'。全加社交，这次的剧本，必须是HE。", scores: { actor: 2, creator: 1 } },
+          { text: "好，太好了。一张'除了好看一无所有'的卡，就该配上这莫名其妙的50点。强度只会妨碍我RP一个惊天动地的废物美人，然后华丽地被黑幕创死。", scores: { explorer: 2, soloist: 1 } }
+        ]
+      },
+      {
+        text: "憨憨队友一脚踩爆了地城唯一的承重柱，30秒后这里将彻底坍塌！你会大喊什么？",
+        options: [
+          { text: "集火左边那堵墙，它的结构最不稳定！快！", scores: { commander: 3, optimizer: 1 } },
+          { text: "别动！根据建筑结构力学和基础热力学，我们立刻躺下能最大化生存截面！要相信科学！", scores: { architect: 2, soloist: 1 } },
+          { text: "TA不能死！我家CP的售后全指望TA了！要塌就先砸我吧！", scores: { actor: 3, collaborator: 1 } },
+          { text: "等等！都别动！你们看那块正在掉的石头...上面的花纹...我超，这不是导入里提到的那个古代遗迹的族徽吗？！", scores: { explorer: 3, creator: 1 } }
+        ]
+      },
+      {
+        text: "Boss爆出两样东西：一把【弑神者都嫌丑的+100战锤】，和一张写着『世界的真相』的【小纸条】。你会？",
+        options: [
+          { text: "真相？真相能有面板重要？战锤给我，神挡杀神，佛挡杀佛！", scores: { architect: 2, soloist: 2 } },
+          { text: "先看纸条。如果这『真相』对不起我掉的SAN值……行吧，又一个烂尾模组，下一位。", scores: { explorer: 3, creator: 1 } },
+          { text: "听骰娘的。谁赢了谁拿，其他人没意见吧？", scores: { commander: 1, collaborator: 2 } },
+          { text: "锤子你们分，我只想搞清楚一件事：这个Boss，和我的背景故事里提到的那个人，到底是什么关系。", scores: { actor: 2, explorer: 1 } }
+        ]
+      },
+      {
+        text: "你们进入一个房间，正中央摆着一个大红按钮，上面写着『别按』。你会？",
+        options: [
+          { text: "按！必须按！跑团不作死，和咸鱼有什么区别？", scores: { explorer: 2, creator: 2 } },
+          { text: "停。这百分之百是KP的陷阱，先侦查房间里所有东西，找出线索再决定。", scores: { architect: 2, optimizer: 1 } },
+          { text: "等等…我的角色预感到，按下这个按钮，会发生非常悲伤的事。我们…不应该碰它。", scores: { actor: 3, soloist: 1 } },
+          { text: "OK，战术时间。A去准备按，B去门口守着，C准备治疗。我喊三二一，我们一起行动。", scores: { commander: 2, collaborator: 1 } }
+        ]
+      },
+      {
+        text: "团队被困，唯一的出路是牺牲一个队友，去拉下远处的同归于尽开关。你会？",
+        options: [
+          { text: "让我去。这是我这张卡最高光的时刻，记得Replay里给我配上最悲伤的BGM，弹幕都给我哭！", scores: { actor: 3, soloist: 2 } },
+          { text: "都别动，让我算一下。……从逻辑上讲，你是最适合的人选。这道题，有且只有一个最优解。", scores: { architect: 3, commander: 1 } },
+          { text: "凭什么要牺牲？一定有别的办法！那个开关能不能用绳子勾过来？或者用之前捡的破烂把它卡住？拒绝无谓的牺牲！", scores: { explorer: 1, creator: 2 } },
+          { text: "……我们投票吧。无论结果如何，这是我们作为一个团队共同的决定，一起背负。", scores: { commander: 1, collaborator: 3 } }
+        ]
+      },
+      {
+        text: "你深爱的NPC一直在利用你，TA对你摊牌了。你会？",
+        options: [
+          { text: "……我知道。但爱上你，是我自己的选择。……这也是我早就决定好的结局。", scores: { actor: 3, soloist: 2 } },
+          { text: "很好。……你的利用价值，到此为止了。", scores: { commander: 2, optimizer: 1 } },
+          { text: "为什么？我想听一次真话。不是谎言，不是借口，是能让我理解这一切的，你的故事。", scores: { explorer: 2, collaborator: 1 } },
+          { text: "原来如此...那你也看看这个。你掏出了早就准备好的调查报告，现在，给你两个选择：要么为我所用，要么……我把这个交给你的对家。", scores: { architect: 2, creator: 1 } }
+        ]
+      },
+      {
+        text: "一个神秘存在出现，说可以用『你最重要的记忆』来交换濒死队友的生命。你会？",
+        options: [
+          { text: "拿去吧，别废话。和TA一起赴死的这段记忆，比我过去的一切都重要。", scores: { actor: 3, collaborator: 2 } },
+          { text: "等等，『最重要的记忆』？定义一下？我要知道这次交易的全部条款和代价，别想坑我。", scores: { architect: 2, optimizer: 1 } },
+          { text: "我拒绝。我的记忆就是我本身，不能拿来交易。而且，我相信我们能靠自己救活TA！", scores: { commander: 2, soloist: 1 } },
+          { text: "比起交易，我对他本人更感兴趣。这个『神秘存在』是谁？祂为什么会在这里？目的是什么？新的谜语人出现了！", scores: { explorer: 3, creator: 1 } }
+        ]
+      },
+      {
+        text: "模组结束，KP问你想为角色安排什么样的结局？",
+        options: [
+          { text: "我想和还活着的人好好聊聊，为这段旅程画上句号。", scores: { actor: 2, collaborator: 2 } },
+          { text: "去图书馆，把所有没搞懂的伏笔都挖出来。我必须知道一切。", scores: { explorer: 3, optimizer: 1 } },
+          { text: "写一封匿名信，把真相交给官方，让那些混蛋得到应有的审判。", scores: { commander: 2, creator: 1 } },
+          { text: "独自一人回到故事开始的地方，静一静，整理一下思绪。", scores: { soloist: 3, actor: 1 } }
+        ]
+      }
+    ];
+
+    // 初始化得分
+    var scores = {
+      architect: 0,
+      commander: 0,
+      actor: 0,
+      explorer: 0,
+      optimizer: 0,
+      creator: 0,
+      collaborator: 0,
+      soloist: 0
+    };
+
+    var currentQuestion = 0;
+
+    // ===========================
+    // 问卷逻辑部分
+    // ===========================
+    function startQuiz() {
+      document.getElementById('start-page').classList.add('hidden');
+      document.getElementById('question-page').classList.remove('hidden');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      var question = questions[currentQuestion];
+      document.getElementById('question-number').textContent = 'Q' + (currentQuestion + 1);
+      document.getElementById('question-text').textContent = question.text;
+      
+      var optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      
+      question.options.forEach(function(option, index) {
+        var button = document.createElement('button');
+        button.className = 'option-button';
+        button.onclick = function() {
+          answerQuestion(option.scores);
+        };
+        
+        var label = document.createElement('span');
+        label.className = 'option-label';
+        label.textContent = String.fromCharCode(65 + index) + '.';
+        
+        var text = document.createElement('span');
+        text.className = 'option-text';
+        text.textContent = option.text;
+        
+        button.appendChild(label);
+        button.appendChild(text);
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    function answerQuestion(optionScores) {
+      // 累加分数
+      for (var key in optionScores) {
+        scores[key] += optionScores[key];
+      }
+
+      // 进入下一题或显示结果
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        calculateAndShowResult();
+      }
+    }
+
+    function calculateAndShowResult() {
+      // 计算得分最高的两个类型
+      var sortedTypes = Object.keys(scores).sort(function(a, b) {
+        return scores[b] - scores[a];
+      });
+
+      var mainType = sortedTypes[0];
+      var subType = sortedTypes[1];
+
+      // 显示结果
+      document.getElementById('result-title').textContent = characterTypes[mainType].title;
+      document.getElementById('result-description').textContent = '"' + characterTypes[mainType].description + '"';
+      
+      var mainTag = document.getElementById('main-tag');
+      mainTag.textContent = characterTypes[mainType].name;
+      mainTag.className = 'tag-pill tag-' + tagColorMap[characterTypes[mainType].color];
+      
+      var subTag = document.getElementById('sub-tag');
+      subTag.textContent = characterTypes[subType].name;
+      subTag.className = 'tag-pill tag-' + tagColorMap[characterTypes[subType].color];
+
+      // 渲染日历
+      renderCalendar();
+
+      // 切换到结果页
+      document.getElementById('question-page').classList.add('hidden');
+      document.getElementById('result-page').classList.remove('hidden');
+    }
+
+    function restart() {
+      currentQuestion = 0;
+      scores = {
+        architect: 0,
+        commander: 0,
+        actor: 0,
+        explorer: 0,
+        optimizer: 0,
+        creator: 0,
+        collaborator: 0,
+        soloist: 0
+      };
+      
+      // 重置结果页面内容
+      document.getElementById('player-name').textContent = '玩家名';
+      document.getElementById('result-title').textContent = '角色称号';
+      document.getElementById('result-description').textContent = '"角色描述将在这里显示"';
+      
+      // 清空日历容器
+      document.getElementById('calendar-container').innerHTML = '';
+      
+      // 重置头像
+      document.getElementById('avatar-preview').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ddd'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23888' text-anchor='middle' dy='.3em'%3E点击上传头像%3C/text%3E%3C/svg%3E";
+      
+      // 清空履历输入
+      var resumeItems = document.querySelectorAll('.resume-item');
+      resumeItems.forEach(function(item) {
+        item.value = '';
+      });
+      
+      // 重置气泡内容
+      document.querySelectorAll('.bubble.editable-area')[0].innerHTML = '喜欢跑团类型<br>PL/KP皆可<br>描述你的偏好';
+      document.querySelectorAll('.bubble.editable-area')[1].innerHTML = '雷点：<br>在这里写下<br>你的雷点';
+      
+      document.getElementById('result-page').classList.add('hidden');
+      document.getElementById('start-page').classList.remove('hidden');
+    }
+
+    // ===========================
+    // 头像上传功能
+    // ===========================
+    const fileInput = document.getElementById('file-input');
+    const avatarPreview = document.getElementById('avatar-preview');
+
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          avatarPreview.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // ===========================
+    // 日历生成与交互逻辑
+    // ===========================
+    let currentTool = null; // 当前选中的工具：'free' | 'busy' | null
+
+    function selectTool(toolType) {
+      // 如果点击已选中的，则取消选中
+      if (currentTool === toolType) {
+        currentTool = null;
+        document.querySelectorAll('.legend-item').forEach(el => el.classList.remove('active'));
+        return;
+      }
+      
+      currentTool = toolType;
+      // 更新UI选中状态
+      document.querySelectorAll('.legend-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('tool-' + toolType).classList.add('active');
+    }
+
+    function renderCalendar() {
+      const container = document.getElementById('calendar-container');
+      // 清空之前的内容
+      container.innerHTML = '';
+      
+      const now = new Date();
+      
+      // 生成当前月和下个月
+      for (let i = 0; i < 2; i++) {
+        const year = now.getFullYear();
+        const month = now.getMonth() + i;
+        
+        // 创建日期对象以获取信息
+        const dateObj = new Date(year, month, 1);
+        const displayYear = dateObj.getFullYear();
+        const displayMonth = dateObj.getMonth();
+        const monthName = displayMonth + 1 + '月';
+
+        // 计算该月第一天是周几
+        const firstDayIndex = dateObj.getDay();
+        // 计算该月有多少天
+        const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+
+        // 创建DOM结构
+        const monthBlock = document.createElement('div');
+        monthBlock.className = 'month-block';
+        
+        const title = document.createElement('div');
+        title.className = 'month-title';
+        title.textContent = monthName;
+        monthBlock.appendChild(title);
+
+        const grid = document.createElement('div');
+        grid.className = 'cal-grid';
+
+        // 填充空白（上个月的）
+        for (let j = 0; j < firstDayIndex; j++) {
+          const emptyCell = document.createElement('div');
+          emptyCell.className = 'cal-cell empty';
+          grid.appendChild(emptyCell);
+        }
+
+        // 填充日期
+        for (let day = 1; day <= daysInMonth; day++) {
+          const cell = document.createElement('div');
+          cell.className = 'cal-cell';
+          cell.textContent = day;
+          
+          // 点击事件
+          cell.addEventListener('click', function() {
+            if (!currentTool) return; // 如果没选工具，不操作
+
+            // 如果当前已经有这个状态，则取消（toggle）
+            // 如果是不同的状态，则覆盖
+            const targetClass = 'status-' + currentTool;
+            
+            // 移除所有状态
+            if (this.classList.contains(targetClass)) {
+              this.classList.remove(targetClass);
+            } else {
+              this.classList.remove('status-free', 'status-busy');
+              this.classList.add(targetClass);
+            }
+          });
+
+          grid.appendChild(cell);
+        }
+
+        monthBlock.appendChild(grid);
+        container.appendChild(monthBlock);
+      }
+    }
+
+    // 绑定事件
+    document.getElementById('start-btn').addEventListener('click', startQuiz);
+    document.getElementById('restart-btn').addEventListener('click', restart);
+  </script>
+</body>
+</html>
